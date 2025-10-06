@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart'; // <<< เพิ่ม import นี้
+import 'package:geolocator/geolocator.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -13,7 +13,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late List<CameraDescription> _cameras;
   late CameraController _controller;
   bool _isInitialized = false;
-  bool _isProcessing = false; // <<< เพิ่ม State สำหรับสถานะ Loading
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -50,27 +50,22 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  // vvvv เราจะแก้ไขฟังก์ชันนี้เป็นหลัก vvvv
   Future<void> _takePictureAndGetData() async {
     if (!_controller.value.isInitialized || _isProcessing) {
       return;
     }
 
     setState(() {
-      _isProcessing = true; // เริ่มประมวลผล, แสดง Loading
+      _isProcessing = true;
     });
 
     try {
-      // 1. ถ่ายภาพ
       final XFile imageFile = await _controller.takePicture();
 
-      // 2. ดึงพิกัด GPS
       final Position position = await _getCurrentLocation();
 
-      // 3. บันทึกเวลา
       final DateTime timestamp = DateTime.now();
 
-      // 4. รวมข้อมูลทั้งหมดไว้ใน Map
       final Map<String, dynamic> resultData = {
         'imagePath': imageFile.path,
         'latitude': position.latitude,
@@ -78,14 +73,13 @@ class _CameraScreenState extends State<CameraScreen> {
         'timestamp': timestamp.toIso8601String(),
       };
 
-      // 5. ส่งข้อมูลทั้งหมดกลับไปหน้าหลัก
       if (mounted) {
         Navigator.pop(context, resultData);
       }
     } catch (e) {
       print('Error processing data: $e');
       setState(() {
-        _isProcessing = false; // ปิด Loading ถ้าเกิดข้อผิดพลาด
+        _isProcessing = false;
       });
       ScaffoldMessenger.of(
         context,
@@ -93,7 +87,6 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  // <<< เพิ่มฟังก์ชันสำหรับดึง GPS >>>
   Future<Position> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -130,7 +123,6 @@ class _CameraScreenState extends State<CameraScreen> {
         fit: StackFit.expand,
         children: [
           CameraPreview(_controller),
-          // แสดง Loading Indicator ขณะกำลังดึง GPS
           if (_isProcessing)
             Container(
               color: Colors.black.withOpacity(0.5),
@@ -148,14 +140,13 @@ class _CameraScreenState extends State<CameraScreen> {
                 ),
               ),
             ),
-          // ปุ่มสำหรับถ่ายภาพ
-          if (!_isProcessing) // ซ่อนปุ่มขณะประมวลผล
+          if (!_isProcessing)
             Positioned(
               bottom: 40,
               left: 0,
               right: 0,
               child: FloatingActionButton(
-                onPressed: _takePictureAndGetData, // <<< เรียกใช้ฟังก์ชันใหม่
+                onPressed: _takePictureAndGetData,
                 child: const Icon(Icons.camera_alt),
               ),
             ),

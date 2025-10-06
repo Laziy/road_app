@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'camera_screen.dart';
 
 void main() async {
-  // ไม่จำเป็นต้องเชื่อมต่อ Supabase ที่ฝั่งแอปอีกต่อไป
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
@@ -16,7 +15,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ส่วน Theme ยังคงเหมือนเดิมเพื่อให้ UI สวยงาม
     return MaterialApp(
       title: 'Check Thang App',
       theme: ThemeData(
@@ -88,7 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // ====== ฟังก์ชันอัปโหลดรายงาน (แก้ไขใหม่ทั้งหมด) ======
   Future<void> _uploadReport() async {
     if (_reportData == null || _selectedImage == null) return;
 
@@ -97,13 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     try {
-      // 1. อ่านไฟล์รูปภาพเป็น Base64 String
       final imageBytes = await _selectedImage!.readAsBytes();
       final base64Image = base64Encode(imageBytes);
 
-      // 2. เตรียมข้อมูลทั้งหมดเพื่อส่งไปที่ Python Server
       final body = {
-        "image": base64Image, // ส่งรูปภาพเป็น Base64
+        "image": base64Image,
         "location": {
           "lat": _reportData!['latitude'],
           "lng": _reportData!['longitude'],
@@ -112,7 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
       };
       debugPrint("Sending JSON to Backend AI...");
 
-      // 3. ส่ง Request ไปที่ Python Server ที่เดียว
       final url = Uri.parse(
         'https://g3tuesm.consolutechcloud.com/backend/predict',
       );
@@ -124,7 +118,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (!mounted) return;
 
-      // 4. จัดการ Response ที่ได้รับกลับมา
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
         setState(() {
@@ -224,7 +217,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // ... (โค้ดในส่วน build() ทั้งหมดเหมือนเดิม ไม่ต้องแก้ไข) ...
     return Scaffold(
       appBar: AppBar(title: Text(widget.title), centerTitle: true),
       body: SingleChildScrollView(
